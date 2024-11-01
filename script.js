@@ -97,7 +97,7 @@ function Clock(countdown, callback) {
 // Função para exibir o Easter Egg no canto direito
 function maybeShowEasterEgg() {
     // Probabilidade de 1 em 100 de aparecer o easter egg em cada atualização
-    if (Math.random() < 0.001) {
+    if (Math.random() < 0.0001) {
         //imagem
         var easterEggImage = document.createElement('img');
         //musica
@@ -117,7 +117,7 @@ function maybeShowEasterEgg() {
         // Remova a imagem após alguns segundos
         setTimeout(function () {
             easterEggImage.remove();
-        }, 6000); // 3 segundos de exibição
+        }, 3000); // 3 segundos de exibição
     }
 }
 
