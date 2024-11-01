@@ -1,13 +1,11 @@
 console.clear();
 
-
 function CountdownTracker(label, value) {
-
     var el = document.createElement('span');
 
     el.className = 'flip-clock__piece';
     el.innerHTML = '<b class="flip-clock__card card"><b class="card__top"></b><b class="card__bottom"></b><b class="card__back"><b class="card__bottom"></b></b></b>' +
-        '<span class="flip-clock__slot">' + label + '</span>';
+        '<span class="flip-clock__slot"></span>';
 
     this.el = el;
 
@@ -17,9 +15,8 @@ function CountdownTracker(label, value) {
         backBottom = el.querySelector('.card__back .card__bottom');
 
     this.update = function (val) {
-        val = ('0' + val).slice(-3);
+        val = String(val); // Permitir qualquer número de dígitos
         if (val !== this.currentValue) {
-
             if (this.currentValue >= 0) {
                 back.setAttribute('data-value', this.currentValue);
                 bottom.setAttribute('data-value', this.currentValue);
@@ -37,35 +34,25 @@ function CountdownTracker(label, value) {
     this.update(value);
 }
 
-// Calculation adapted from https://www.sitepoint.com/build-javascript-countdown-timer-no-dependencies/
-
 function getTimeRemaining(endtime) {
     var t = Date.parse(endtime) - Date.parse(new Date());
+    var hours = Math.floor((t / (1000 * 60 * 60)) % 24);
+    var minutes = Math.floor((t / 1000 / 60) % 60);
+    var seconds = Math.floor((t / 1000) % 60);
     return {
         'Total': t,
         'Days': Math.floor(t / (1000 * 60 * 60 * 24)),
-        'Hours': Math.floor((t / (1000 * 60 * 60)) % 24),
-        'Minutes': Math.floor((t / 1000 / 60) % 60)/* ,
-        'Seconds': Math.floor((t / 1000) % 60) */
-    };
-}
-
-function getTime() {
-    var t = new Date();
-    return {
-        'Total': t,
-        'Hours': t.getHours() % 12,
-        'Minutes': t.getMinutes(),
-        'Seconds': t.getSeconds()
+        'Hours': (hours < 10) ? '0' + hours : hours,
+        'Minutes': (minutes < 10) ? '0' + minutes : minutes,
+        'Seconds': (seconds < 10) ? '0' + seconds : seconds
     };
 }
 
 function Clock(countdown, callback) {
-
     countdown = countdown ? new Date(Date.parse(countdown)) : false;
     callback = callback || function () { };
 
-    var updateFn = countdown ? getTimeRemaining : getTime;
+    var updateFn = getTimeRemaining;
 
     this.el = document.createElement('div');
     this.el.className = 'flip-clock';
@@ -84,7 +71,6 @@ function Clock(countdown, callback) {
     function updateClock() {
         timeinterval = requestAnimationFrame(updateClock);
 
-        // throttle so it's not constantly updating the time.
         if (i++ % 10) { return; }
 
         var t = updateFn(countdown);
@@ -100,17 +86,43 @@ function Clock(countdown, callback) {
         for (key in trackers) {
             trackers[key].update(t[key]);
         }
+
+        // Adicione aqui o Easter Egg
+        maybeShowEasterEgg();
     }
 
     setTimeout(updateClock, 500);
 }
 
-//var deadline = new Date(Date.parse(new Date()) + 365 * 24 * 60 * 60 * 1000);
-var deadline = new Date('2025-11-01T00:00:00-03:00');
+// Função para exibir o Easter Egg no canto direito
+function maybeShowEasterEgg() {
+    // Probabilidade de 1 em 100 de aparecer o easter egg em cada atualização
+    if (Math.random() < 0.001) {
+        //imagem
+        var easterEggImage = document.createElement('img');
+        //musica
+        var easterEggSound = new Audio('sound.mp3');
+        
+        easterEggImage.src = 'url.webp'; // Coloque o caminho da sua imagem aqui
+        easterEggImage.className = 'easter-egg';
+        easterEggImage.style.position = 'fixed';
+        easterEggImage.style.width = '10%';
+        easterEggImage.style.bottom = '0px'; // Ajuste a posição de cima se necessário
+        easterEggImage.style.right = '10px'; // Ajuste a posição da direita se necessário
+        easterEggImage.style.zIndex = 1000; // Certifique-se de que a imagem apareça por cima
+        
+        document.body.appendChild(easterEggImage);
+        easterEggSound.play()
+        
+        // Remova a imagem após alguns segundos
+        setTimeout(function () {
+            easterEggImage.remove();
+        }, 6000); // 3 segundos de exibição
+    }
+}
 
-var c = new Clock(deadline, function () { alert('countdown complete') });
-
+var deadline = new Date('2025-10-31T00:00:00');
+var c = new Clock(deadline, function () { alert('countdown complete'); });
 document.body.appendChild(c.el);
 
-//var clock = new Clock();
-//document.body.appendChild(clock.el);
+var clock = new Clock();
